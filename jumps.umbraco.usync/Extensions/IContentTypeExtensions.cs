@@ -44,6 +44,7 @@ namespace jumps.umbraco.usync.Extensions
 
             // fix the current (v6.1/v7.0.1) api doesn't do
             // structure export proper
+            
             var structure = element.Element("Structure");
 
             // empty it out. 
@@ -53,6 +54,7 @@ namespace jumps.umbraco.usync.Extensions
             // order isn't always right, and we care because we get hash values
             // 
             SortedList<int, ContentTypeSort> allowedTypes = new SortedList<int, ContentTypeSort>();
+            
             foreach(var t in item.AllowedContentTypes)
             {
                 allowedTypes.Add(t.Id.Value, t);
@@ -64,6 +66,20 @@ namespace jumps.umbraco.usync.Extensions
                 structure.Add(new XElement("DocumentType", allowedItem.Alias));
                 allowedItem.DisposeIfDisposable();
             }
+            
+
+            //
+            // Composite Types (mixins... early support)
+            //
+            var compositeElement = new XElement("Compositions");
+            foreach (var t in item.ContentTypeComposition)
+            {
+                LogHelper.Debug<SyncDocType>("Comp {0} {1}", () => t.Alias, () => t.SortOrder);
+                compositeElement.Add(new XElement("DocumentType", t.Alias));
+            }
+
+            element.Add(compositeElement);            
+            
             
 
             // put the sort order on the tabs
@@ -132,6 +148,47 @@ namespace jumps.umbraco.usync.Extensions
                 }
             }
             item.AllowedContentTypes = allowed;
+        }
+
+        public static void ImportComposition(this IContentType item, XElement node)
+        {
+            XElement compostions = node.Element("Compositions");
+
+            if (compostions == null)
+                return;
+           
+            List<string> compositionTypes = new List<string>();
+            foreach(var comp in compostions.Elements("DocumentType"))
+            {
+                string alias = comp.Value;
+                compositionTypes.Add(alias);
+
+                LogHelper.Info<SyncDocType>("3");
+                if (!item.ContentTypeCompositionExists(alias))
+                {
+                    IContentTypeComposition newType = _contentTypeService.GetContentType(alias);
+                    item.AddContentType(newType);
+                    LogHelper.Info<SyncDocType>("Adding Composite Type: {0}", () => alias);
+                }
+            }
+
+            List<string> existingTypes = new List<string>();
+            foreach(var t in item.ContentTypeComposition)
+            {
+                existingTypes.Add(t.Alias);
+            }
+
+            // remove any...
+            foreach(var exsiting in existingTypes)
+            {
+                if ( !compositionTypes.Contains(exsiting))
+                {
+                    LogHelper.Info<SyncDocType>("Removing Composite Type: {0}", () => exsiting);
+                    item.RemoveContentType(exsiting);
+                }
+            }
+
+            
         }
 
         public static void ImportTabSortOrder(this IContentType item, XElement node)

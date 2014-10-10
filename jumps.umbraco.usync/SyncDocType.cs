@@ -210,6 +210,8 @@ namespace jumps.umbraco.usync
                         // import structure
                         docType.ImportStructure(node);
 
+                        docType.ImportComposition(node);
+
 
                         LogHelper.Debug<uSync>("Missing Property Removal", () => update.Value);
                         // delete things that are not in our source xml?
