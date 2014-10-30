@@ -1,4 +1,4 @@
-jumps.umbraco.usync
+uSync for Umbraco 
 ===================
 
 Syncing tool for umbraco to read and write the database elements to disk.
@@ -20,18 +20,20 @@ of your Umbraco installation.
 
 When the web site is restarted, uSync will read from the disk and add any xml files it finds back into the database.
 
-In theory, you could: 
+In theory this can help you: 
 
-1. Build a new Umbraco install
-3. Add the uSync folder and other umbraco files (i.e stylesheets) from another install
-2. Add the usync.dll
-4. Watch uSync build the umbraco settings from disk. 
+1. Source Control your umbraco developements
+2. automate some elements of the deployment of umbraco
+3. keep multiple developers in sync without sharing the database
 
 Status
 ======
-uSync is becoming more and more stable. 
+uSync 3.x is the result of a major investment in the codebase of uSync, and includes lots of new features and fixes making it the most complete version fro far:
 
-* On the Umbraco 4.11.x tree, it's quite solid. 
-* On Umbraco 6, there have been some changes but uSync appears to work well from 6.0.6/6.1.+
+v3.0 was build specifically for v6.1.6 of umbraco but works all the way upto v6.2.4 (so far).
+
+this branch will be moved forward overtime and become the stable root for v7 versions of uSync replacing v2.2.
+   
+
 
 
